@@ -29,9 +29,19 @@ class SubCategoriesView(generics.ListAPIView):
     queryset = SubCategory.objects.all().order_by("name")
 
 
-class PopularListingView(generics.ListAPIView):
+class HomeListingView(generics.ListAPIView):
     serializer_class = BusinessSerializer
     queryset = Business.objects.all().order_by("-views")
+
+    def get_queryset(self):
+        section = self.request.query_params.get("section")
+
+        queryset = self.queryset
+
+        if section in [ "popular", "featured", "environs", "top", "new" ]:
+            queryset = queryset.filter(section=section)
+        
+        return queryset
 
 
 

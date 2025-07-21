@@ -47,9 +47,10 @@ def BusinessImagePath(instance, filename):
 class Business(models.Model):
     SECTION_CHOICES = [
         ("featured", "Featured"),
-        ("top", "Top"),
         ("popular", "Popular"),
+        ("environs", "Nairobi Environs"),
         ("new", "New"),
+        ("top", "Top"),
     ]
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False, unique=True)
