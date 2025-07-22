@@ -31,7 +31,7 @@ class SubCategoriesView(generics.ListAPIView):
 
 class HomeListingView(generics.ListAPIView):
     serializer_class = BusinessSerializer
-    queryset = Business.objects.all().order_by("-views")
+    queryset = Business.objects.all().order_by("-created_at")
 
     def get_queryset(self):
         section = self.request.query_params.get("section")
@@ -43,6 +43,11 @@ class HomeListingView(generics.ListAPIView):
         
         return queryset
 
+
+
+class AllListingsView(generics.ListAPIView):
+    serializer_class = BusinessSerializer
+    queryset = Business.objects.all().order_by("-created_at")
 
 
 class BusinessDetailsView(generics.RetrieveAPIView):
