@@ -98,8 +98,19 @@ class MerchantUploadImageView(generics.ListCreateAPIView):
     serializer_class = GallerySerializer
     queryset = BusinessGallery.objects.all()
 
+    def get_queryset(self):
+        queryset = BusinessGallery.objects.filter(created_by=self.request.user)
+        business_id = self.request.query_params.get('business')
+
+        if business_id:
+            queryset = queryset.filter(business_id=business_id)
+        
+        return queryset
+
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
+
+    
         
 
 
