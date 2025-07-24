@@ -5,11 +5,21 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
+
 
 from apps.accounts.models import *
 from apps.businesses.models import *
 from apps.businesses.serializers import *
 # Create your views here.
+
+
+class PaginationView(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 
 class CategoryListWithBusinessCountView(generics.ListAPIView):
@@ -48,6 +58,9 @@ class HomeListingView(generics.ListAPIView):
 class AllListingsView(generics.ListAPIView):
     serializer_class = BusinessSerializer
     queryset = Business.objects.all().order_by("-created_at")
+    pagination_class = PaginationView
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['category']
 
 
 class BusinessDetailsView(generics.RetrieveAPIView):
@@ -57,6 +70,13 @@ class BusinessDetailsView(generics.RetrieveAPIView):
 
 
 
+class SimilarBusinessView(generics.ListAPIView):
+    serializer_class = BusinessSerializer
+    queryset = Business.objects.all().order_by("-created_at")
+
+    def get_queryset(self):
+        category = self.request.query_params.get("category")
+        return self.queryset.filter(category=category)
 
 
 class ReviewsView(generics.CreateAPIView):
