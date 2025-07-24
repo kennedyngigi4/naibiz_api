@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 from rest_framework import generics, status
 from rest_framework.views import APIView
@@ -8,8 +8,24 @@ from rest_framework.response import Response
 from apps.accounts.models import *
 from apps.businesses.models import *
 from apps.businesses.serializers import *
+from apps.messaging.serializers import *
+from apps.payments.mpesa import *
 
 
+class StatisticsView(APIView):
+
+    def get(self, request):
+        businesses_count = Business.objects.filter(created_by=self.request.user).count()
+        bookings_count = Booking.objects.filter(business__created_by=self.request.user).count()
+        reviews_count = Review.objects.filter(business__created_by=self.request.user).count()
+        messages_count = Message.objects.filter(business__created_by=self.request.user).count()
+
+        return Response([
+            { "title": "businesses", "count": businesses_count, "bg": "bg-light-success", "icon": "BsPinMapFill", "iconStyle":'text-success', },
+            { "title": "bookings", "count": bookings_count, "bg": "bg-light-danger", "icon": "BsGraphUpArrow", "iconStyle":'text-danger', },
+            { "title": "reviews", "count": reviews_count, "bg": "bg-light-warning", "icon": "BsSuitHeart", "iconStyle":'text-warning', },
+            { "title": "messages", "count": messages_count, "bg": "bg-light-info", "icon": "BsYelp", "iconStyle":'text-info', },
+        ])
 
 
 class AddListingView(APIView):
@@ -19,18 +35,18 @@ class AddListingView(APIView):
     def post(self, request):
         user = self.request.user
         serializer = self.serializer_class(data=request.data, context={"request": request})
-
-        hours_data = request.data["hours"]
-        for hour in hours_data:
-            print("Hour type:", type(hour))
-            print("Hour raw:", hour)
         
         if serializer.is_valid():
-            print(request.data["hours"])
-            serializer.save(
+            category = request.data["category"]
+            phone = request.data["phone"]
+            category = get_object_or_404(Category, id=category)
+            business = serializer.save(
                 created_by=user
             )
-            return Response({ "success": True, "message": "Listing successful", })
+
+            if business:
+                mpesa = MPESA(phone, int(category.price)).MpesaSTKPush()
+                return Response({ "success": True, "message": "Listing successful", })
         
         print("Validation Errors:", serializer.errors)
         return Response({ "success": False, "message": serializer.errors, })
@@ -44,9 +60,62 @@ class AllListingsView(generics.ListAPIView):
 
 
     def get_queryset(self):
+        
+        
         user = self.request.user
         queryset = self.queryset.filter(created_by=user)
         return queryset
+
+
+class ListingDetails(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [ IsAuthenticated ]
+    serializer_class = BusinessSerializer
+    queryset = Business.objects.all()
+    lookup_field = "slug"
+
+
+
+
+class MerchantUploadImageView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = GallerySerializer
+    queryset = BusinessGallery.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+        
+
+
+
+
+
+class MyBookingsViews(generics.ListAPIView):
+    serializer_class = BookingSerializer
+    permission_classes = [ IsAuthenticated ]
+
+    def get_queryset(self):
+        return Booking.objects.filter(business__created_by=self.request.user)
+
+
+class MyBusinessReviewView(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [ IsAuthenticated ]
+
+
+    def get_queryset(self):
+        return Review.objects.filter(business__created_by=self.request.user)
+
+
+
+class MessagesView(generics.ListAPIView):
+    serializer_class = MessageSerializer
+    permission_classes = [ IsAuthenticated ]
+
+    def get_queryset(self):
+        return Message.objects.filter(business__created_by=self.request.user)
+    
+
+
 
 
 

@@ -2,6 +2,7 @@ import json
 from rest_framework import serializers 
 from apps.accounts.models import User
 from apps.businesses.models import *
+from apps.shop.serializers import *
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 
@@ -49,6 +50,19 @@ class BusinessHourSerializer(serializers.ModelSerializer):
         ]
 
 
+class GallerySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessGallery
+        fields = ["id", "business", "image"]
+        
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = [
+            "id", "business", "email", "rating", "title", "message", "created_at"
+        ]
+
 
 class BusinessSerializer(serializers.ModelSerializer):
     hours = BusinessHourSerializer(many=True, required=False)
@@ -56,14 +70,17 @@ class BusinessSerializer(serializers.ModelSerializer):
     created_by = OwnerSerializer(read_only=True)
     category_name = serializers.SerializerMethodField()
     category_icon = serializers.SerializerMethodField()
-    # category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), many=True)
+    products = ProductSerializer(many=True, required=False)
+    gallery = GallerySerializer(many=True, required=False)
+    reviews = ReviewSerializer(many=True, required=False)
 
     class Meta:
         model = Business
         fields = [
             'id', 'slug', 'name', 'category', 'category_name', 'category_icon', 'mall', 'services', 'location', 'latitude', 'longitude', 'description', "profile_image", "main_banner", 
             'phone', 'email', 'website', 'whatsapp', 'facebook', 'instagram', 'twitterx', 'tiktok', 'linkedin', 'youtube',
-            'is_verified', 'is_active', 'created_by', 'created_at', 'updated_at', 'expires_at', 'hours', 'views', 'is_open'
+            'is_verified', 'is_active', 'created_by', 'created_at', 'updated_at', 'expires_at', 'hours', 'views', 'is_open', 
+            'products', 'gallery', 'reviews',
         ]
         read_only_fields = [ 'slug', 'created_at', 'updated_at', 'views' ]
 
@@ -124,3 +141,21 @@ class BusinessSerializer(serializers.ModelSerializer):
                 BusinessHour.objects.create(busness=instance, **hour)
 
         return instance
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

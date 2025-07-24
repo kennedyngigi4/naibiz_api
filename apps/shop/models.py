@@ -19,7 +19,7 @@ class Product(models.Model):
     name = models.CharField(max_length=255, verbose_name=_("name"))
     slug = models.SlugField(unique=True, verbose_name=_("slug"))
 
-    category = models.ManyToManyField(Category, verbose_name=_("categories"))
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, verbose_name=_("categories"))
     main_image = models.ImageField(upload_to=ProductImagePath, verbose_name=_("image"))
     description = models.TextField(verbose_name=_("description"))
 
@@ -28,7 +28,7 @@ class Product(models.Model):
     is_discounted = models.BooleanField(default=False)
     in_stock = models.BooleanField(default=True)
 
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, verbose_name=_("related business"))
+    business = models.ForeignKey(Business, related_name="products", on_delete=models.CASCADE, verbose_name=_("related business"))
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("owner"))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("time created"))
 

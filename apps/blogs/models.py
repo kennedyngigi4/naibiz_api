@@ -25,6 +25,7 @@ class Blog(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     is_published = models.BooleanField(default=False)
     for_company = models.BooleanField(default=False)
+    views = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
@@ -38,5 +39,34 @@ class Blog(models.Model):
 
     def __str__(self):
         return str(self.title)
+
+
+class Comment(models.Model):
+
+    name = models.CharField(max_length=70)
+    email = models.EmailField()
+    desc = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
+
+class CompanyReview(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True, verbose_name=_("unique ID"))
+
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+
+    client_name = models.CharField(max_length=60)
+    client_designation = models.CharField(max_length=50)
+    rate = models.PositiveIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return f"{self.title} by {self.client_name}"
+
 
 

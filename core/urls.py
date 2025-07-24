@@ -16,8 +16,23 @@ urlpatterns = [
     path( "api/businesses/merchant/", include("apps.businesses.merchant.urls")),
 
 
+    path( "api/messages/", include("apps.messaging.urls")),
+
+
     path( "api/malls/", include("apps.malls.urls")),
 ]
+
+
+urlpatterns += [
+    path( "api/shop/merchant/", include("apps.shop.merchant.urls")),
+]
+
+
+
+urlpatterns += [
+    path( "api/blogs/", include("apps.blogs.urls")),
+]
+
 
 
 urlpatterns += static( settings.STATIC_URL, document_root=settings.STATIC_ROOT )

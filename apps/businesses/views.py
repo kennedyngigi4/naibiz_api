@@ -55,3 +55,19 @@ class BusinessDetailsView(generics.RetrieveAPIView):
     queryset = Business.objects.all()
     lookup_field = "slug"
 
+
+
+
+
+class ReviewsView(generics.CreateAPIView):
+    serializer_class = ReviewSerializer
+    queryset = Review.objects.all().order_by("-created_at")
+
+    def post(self, request):
+        serializer = ReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"success": True, "message": "Review submitted!"})
+        return Response({ "success": False, "message": serializer.errors })
+
+

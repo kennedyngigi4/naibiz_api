@@ -7,16 +7,31 @@ from apps.businesses.models import *
 # Create your models here.
 
 
-class Message(models.Model):
+
+class Booking(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-    content = models.TextField(verbose_name=_("message"))
-    date_created = models.DateTimeField(auto_now_add=True)
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, verbose_name=_("business"))
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owner", verbose_name=_("owner"))
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender", verbose_name=_("sender"))
+    booking_date = models.DateField(null=True)
+    booking_time = models.TimeField(null=True)
+    booking_message = models.TextField(null=True)
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="bookings", verbose_name=_("business"))
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Message to {self.user}"
+        return f"{self.booking_date} for {self.business.name}"
+    
+
+
+class Message(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+
+    content = models.TextField(verbose_name=_("message"))
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="messages", verbose_name=_("business"))
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name="owner", verbose_name=_("owner"))
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name="sender", verbose_name=_("sender"))
+    date_created = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"Message to {self.business.name}"
     
 
 

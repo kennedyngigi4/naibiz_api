@@ -167,16 +167,17 @@ class BusinessHour(models.Model):
 class BusinessGallery(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="gallery")
     image = models.ImageField(upload_to=BusinessImagePath)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return f"{self.id}. {self.business.name}"
+        return f"{self.business.name}"
 
 
 
 class Review(models.Model):
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False, unique=True, verbose_name=_("unique ID"))
-    business = models.OneToOneField(Business, on_delete=models.CASCADE, related_name="kyc", verbose_name=_("business"))
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="reviews", verbose_name=_("business"))
 
     email = models.EmailField(verbose_name=_("email"))
     rating = models.PositiveIntegerField(verbose_name=_("rating"))
