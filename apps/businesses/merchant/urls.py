@@ -11,6 +11,7 @@ urlpatterns = [
     path("add_listing/", AddListingView.as_view(), name="add_listing", ),
     path("all_listings/", AllListingsView.as_view(), name="all_listings", ),
     path("listing/<slug:slug>/", ListingDetails.as_view(), name="listing", ),
+    path("listing_update/<slug:slug>/", ListingUpdateAPIView.as_view(), name="listing_update", ),
     path("gallery/", MerchantUploadImageView.as_view(), name="gallery", ),
 ]
 

@@ -4,6 +4,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from apps.accounts.models import *
 from apps.businesses.models import *
@@ -72,6 +73,22 @@ class ListingDetails(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BusinessSerializer
     queryset = Business.objects.all()
     lookup_field = "slug"
+
+
+
+class ListingUpdateAPIView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def patch(self, request, slug):
+        business = get_object_or_404(Business, slug=slug)
+        serializer = BusinessSerializer(business, data=request.data, partial=True)
+        print(type(request.FILES.get("profile_image"))) 
+        if serializer.is_valid():
+            print(business)
+            serializer.save()
+            return Response({'success': True, 'message': 'Listing updated successfully.'})
+        print(serializer.errors)
+        return Response({'success': False, 'message': serializer.errors}, status=400)
 
 
 

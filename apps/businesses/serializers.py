@@ -82,7 +82,7 @@ class BusinessSerializer(serializers.ModelSerializer):
             'is_verified', 'is_active', 'created_by', 'created_at', 'updated_at', 'expires_at', 'hours', 'views', 'is_open', 
             'products', 'gallery', 'reviews',
         ]
-        read_only_fields = [ 'slug', 'created_at', 'updated_at', 'views' ]
+        read_only_fields = [ 'slug', 'created_at', 'updated_at', 'views', 'expires_at' ]
 
 
     def get_is_open(self, obj):
@@ -125,22 +125,36 @@ class BusinessSerializer(serializers.ModelSerializer):
 
     
     def update(self, instance, validated_data):
-        hours_data = validated_data.pop("hours", None)
-        categories = validated_data.pop("category", None)
+        request = self.context.get("request")
+        hours_data = request.data.getlist("hours")
+
+        # Handle optional FK updates
+        category = validated_data.pop("category", None)
+        mall = validated_data.pop("mall", None)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+
+        if category is not None:
+            instance.category = category
+
+        if mall is not None:
+            instance.mall = mall
+
         instance.save()
 
-        if categories is not None:
-            instance.category.set(categories)
-
-        if hours_data is not None:
+        if hours_data:
             instance.hours.all().delete()
-            for hour in hours_data:
-                BusinessHour.objects.create(busness=instance, **hour)
+            for hour_str in hours_data:
+                try:
+                    hour = json.loads(hour_str)
+                except json.JSONDecodeError:
+                    continue
+                if isinstance(hour, dict) and (hour.get("opening_time") or hour.get("closing_time")):
+                    BusinessHour.objects.create(business=instance, **hour)
 
         return instance
+
     
 
 
