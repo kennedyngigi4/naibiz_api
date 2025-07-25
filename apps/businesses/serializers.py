@@ -5,6 +5,7 @@ from apps.businesses.models import *
 from apps.shop.serializers import *
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.db.models import Avg
 
 
 class OwnerSerializer(serializers.ModelSerializer):
@@ -73,6 +74,8 @@ class BusinessSerializer(serializers.ModelSerializer):
     products = ProductSerializer(many=True, required=False)
     gallery = GallerySerializer(many=True, required=False)
     reviews = ReviewSerializer(many=True, required=False)
+    rating = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Business
@@ -80,9 +83,17 @@ class BusinessSerializer(serializers.ModelSerializer):
             'id', 'slug', 'name', 'category', 'category_name', 'category_icon', 'mall', 'services', 'location', 'latitude', 'longitude', 'description', "profile_image", "main_banner", 
             'phone', 'email', 'website', 'whatsapp', 'facebook', 'instagram', 'twitterx', 'tiktok', 'linkedin', 'youtube',
             'is_verified', 'is_active', 'created_by', 'created_at', 'updated_at', 'expires_at', 'hours', 'views', 'is_open', 
-            'products', 'gallery', 'reviews',
+            'products', 'gallery', 'reviews', 'rating',
         ]
         read_only_fields = [ 'slug', 'created_at', 'updated_at', 'views', 'expires_at' ]
+
+
+    def get_rating(self, obj):
+        reviews = obj.reviews.all()
+        if reviews.exists():
+            avg = reviews.aggregate(Avg('rating'))['rating__avg']
+            return round(avg, 1) if avg is not None else None
+        return None
 
 
     def get_is_open(self, obj):
