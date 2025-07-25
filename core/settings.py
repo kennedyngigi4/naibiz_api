@@ -19,7 +19,8 @@ ALLOWED_HOSTS = [ 'api.nairobibusiness.co.ke', 'www.api.nairobibusiness.co.ke', 
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://nairobibusiness.co.ke"
+    "https://nairobibusiness.co.ke",
+    "https://www.nairobibusiness.co.ke",
 ]
 
 
