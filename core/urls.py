@@ -25,6 +25,7 @@ urlpatterns = [
 
 urlpatterns += [
     path( "api/shop/merchant/", include("apps.shop.merchant.urls")),
+    path( "api/shop/", include("apps.shop.urls")),
 ]
 
 
