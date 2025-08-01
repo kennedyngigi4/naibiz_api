@@ -1,15 +1,20 @@
+import os
 import requests
 import base64
 import json
 from requests.auth import HTTPBasicAuth 
+from pathlib import Path
 from datetime import datetime
+from dotenv import load_dotenv
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 class MPESA:
 
     def __init__(self, phone, amount):
-        self.consumer_key = "CoekQiy5PmUdgRJtRKyCoV9WB3pMWj6cabG1lWP2H6XllhHB"
-        self.consumer_secret = "sksJnGakoPJdNFFuoLsXbs7AyLCVFpyAQ9SrspTdG6EzeIVvANFTjwtYCjuoNdlk"
+        self.consumer_key = os.getenv("consumer_key")
+        self.consumer_secret = os.getenv("consumer_secret")
         self.authorization_url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
         self.phone = phone
         self.amount = amount
@@ -49,7 +54,7 @@ class MPESA:
             "BusinessShortCode": self.LipaNow()['business_short_code'],
             "Password": self.LipaNow()['decode_password'],
             "Timestamp": self.LipaNow()['lipa_time'],
-            "TransactionType": "CustomerBuyGoodsOnline",
+            "TransactionType": "CustomerPayBillOnline",
             "Amount": self.amount,
             "PartyA": self.phone,  # replace with your phone number to get stk push
             "PartyB": self.LipaNow()['business_short_code'],

@@ -14,6 +14,7 @@ class Category(models.Model):
     price = models.PositiveIntegerField()
     active_days = models.PositiveIntegerField(null=True)
     is_free = models.BooleanField(default=False)
+    is_main = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
     icon = models.TextField(null=True)
 

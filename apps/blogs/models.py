@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
+from tinymce.models import HTMLField
 
 from apps.accounts.models import *
 from apps.businesses.models import *
@@ -19,7 +20,7 @@ class Blog(models.Model):
 
     title = models.CharField(max_length=255, verbose_name=_("title"))
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, verbose_name=_("categories"))
-    content = models.TextField(verbose_name=_("content"))
+    content = HTMLField(verbose_name=_("content"))
     image = models.ImageField(upload_to=BlogImagePath)
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)

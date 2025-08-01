@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'tinymce',
 
     'apps.accounts.apps.AccountsConfig',
     'apps.blogs.apps.BlogsConfig',

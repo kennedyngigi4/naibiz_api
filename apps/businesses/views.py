@@ -26,7 +26,7 @@ class CategoryListWithBusinessCountView(generics.ListAPIView):
     serializer_class = CategoryWithCountSerializer
 
     def get_queryset(self):
-        return Category.objects.annotate(business_count=Count("businesses")).order_by("-business_count")
+        return Category.objects.filter(is_main=True).annotate(business_count=Count("businesses")).order_by("-business_count")
 
 
 class CategoriesView(generics.ListAPIView):
