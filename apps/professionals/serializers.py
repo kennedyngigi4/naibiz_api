@@ -34,8 +34,12 @@ class ProfessionalProfileSerializer(serializers.ModelSerializer):
 
 
     def get_professionname(self, obj):
-        return obj.profession.name
+        if obj.profession:
+            return obj.profession.name
+        return None
     
     def get_professionicon(self, obj):
-        return obj.profession.icon
+        if obj.profession:
+            return obj.profession.icon
+        return None
 
