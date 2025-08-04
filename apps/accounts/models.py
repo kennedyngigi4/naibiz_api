@@ -72,7 +72,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         ( 'admin', 'Admin', ),
         ( 'client', 'Client', ),
         ( 'manager', 'Manager', ),
+        
         ( 'merchant', 'Merchant', ),
+        ( 'professional', 'Professional', ),
     ]
 
     id = models.UUIDField(primary_key=True, unique=True, default=uuid.uuid4, editable=False)

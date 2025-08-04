@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'apps.shop.apps.ShopConfig',
     'apps.malls.apps.MallsConfig',
     'apps.messaging.apps.MessagingConfig',
+    'apps.professionals.apps.ProfessionalsConfig',
 ]
 
 

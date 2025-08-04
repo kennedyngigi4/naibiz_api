@@ -33,7 +33,7 @@ class LoginView(TokenObtainPairView):
 
 
     def post(self, request, *args, **kwargs):
-        print(request.data)
+        
         try:
             response = super().post(request, *args, **kwargs)
             data = response.data

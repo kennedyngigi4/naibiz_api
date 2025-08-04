@@ -11,27 +11,25 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path( "api/account/", include("apps.accounts.urls")),
 
-
     path( "api/businesses/", include("apps.businesses.urls")),
     path( "api/businesses/merchant/", include("apps.businesses.merchant.urls")),
 
-
     path( "api/messages/", include("apps.messaging.urls")),
-
 
     path( "api/malls/", include("apps.malls.urls")),
 ]
-
 
 urlpatterns += [
     path( "api/shop/merchant/", include("apps.shop.merchant.urls")),
     path( "api/shop/", include("apps.shop.urls")),
 ]
 
-
-
 urlpatterns += [
     path( "api/blogs/", include("apps.blogs.urls")),
+]
+
+urlpatterns += [
+    path( "api/professional/", include("apps.professionals.urls")),
 ]
 
 

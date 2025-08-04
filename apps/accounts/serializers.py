@@ -53,6 +53,7 @@ class LoginSerializer(TokenObtainPairSerializer):
         data["id"] = self.user.id
         data["fullname"] = self.user.fullname
         data["email"] = self.user.email
+        data["role"] = self.user.role
 
         return data
 
