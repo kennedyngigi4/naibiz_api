@@ -24,14 +24,15 @@ class SpecializationsView(generics.ListAPIView):
 
 
 class AllProfessionals(generics.ListAPIView):
-    serializer_class = ProfessionalProfileSerializer
+    serializer_class = ProfessionalProfileReadSerializer
     queryset = ProfessionalProfile.objects.all().order_by("-created_at")
 
 
 class ProfessionalDetailsView(generics.RetrieveAPIView):
-    serializer_class = ProfessionalProfileSerializer
+    serializer_class = ProfessionalProfileReadSerializer
     queryset = ProfessionalProfile.objects.all()
     lookup_field = "slug"
+
 
 
 class ProfessionalProfileView(generics.RetrieveUpdateAPIView):

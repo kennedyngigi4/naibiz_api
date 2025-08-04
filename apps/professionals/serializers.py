@@ -21,6 +21,19 @@ class SpecializationsSerializer(serializers.ModelSerializer):
 
 class ProfessionalProfileSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = ProfessionalProfile
+        fields = [
+            "id", "fullname", "title", "profession", "specializations","bio", "years_of_experience", 
+            "phone", "email", "website", "location", "profile_image", "banner_image", "consultation_fee"
+        ]
+        read_only_fields = ['id']
+
+    
+
+
+class ProfessionalProfileReadSerializer(serializers.ModelSerializer):
+
     professionname = serializers.SerializerMethodField()
     professionicon = serializers.SerializerMethodField()
 
