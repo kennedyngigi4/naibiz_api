@@ -95,6 +95,7 @@ class ProfessionalProfile(models.Model):
 
 class Education(models.Model):
     professional = models.ForeignKey(ProfessionalProfile, on_delete=models.CASCADE, related_name='education')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_educations', null=True)
     institution = models.CharField(max_length=255)
     degree = models.CharField(max_length=255)
     field_of_study = models.CharField(max_length=255)
@@ -108,6 +109,7 @@ class Education(models.Model):
 
 class WorkExperience(models.Model):
     professional = models.ForeignKey(ProfessionalProfile, on_delete=models.CASCADE, related_name='work_experience')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_experience', null=True)
     position = models.CharField(max_length=255)
     company = models.CharField(max_length=255)
     start_date = models.DateField()
@@ -116,6 +118,20 @@ class WorkExperience(models.Model):
 
     def __str__(self):
         return f"{self.position} at {self.company}"
+
+
+
+class Schedule(models.Model):
+    professional = models.ForeignKey(ProfessionalProfile, on_delete=models.CASCADE, related_name='schedule')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_schedule', null=True)
+
+    schedule_day = models.CharField(max_length=50)
+    time_from = models.TimeField(null=True)
+    time_to = models.TimeField(null=True)
+    details = models.TextField(null=True)
+
+    def __str__(self):
+        return f"{self.day} - {self.user.fullname}"
 
 
 
