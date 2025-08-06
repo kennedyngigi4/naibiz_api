@@ -3,6 +3,22 @@ from apps.professionals.models import *
 
 
 
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = [
+            "id", "professional", "message", "created_at"
+        ]
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        fields = [
+            "id","time_booked", "date_booked", "professional", "message", "created_at"
+        ]
+
+
 class ProfessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profession
@@ -25,7 +41,7 @@ class ProfessionalProfileSerializer(serializers.ModelSerializer):
         model = ProfessionalProfile
         fields = [
             "id", "fullname", "title", "profession", "specializations","bio", "years_of_experience", 
-            "phone", "email", "website", "location", "profile_image", "banner_image", "consultation_fee"
+            "phone", "email", "website", "location", "latitude", "longitude", "profile_image", "banner_image", "consultation_fee"
         ]
         read_only_fields = ['id']
 
@@ -67,7 +83,7 @@ class ProfessionalProfileReadSerializer(serializers.ModelSerializer):
         model = ProfessionalProfile
         fields = [
             "id", "fullname", "title", "profession", "professionname", "professionicon", "specializations","bio", "years_of_experience", 
-            "phone", "email", "website", "location", "profile_image", "banner_image", "consultation_fee", "slug", "education", "work_experience", "schedule"
+            "phone", "email", "website", "location", "latitude", "longitude", "profile_image", "banner_image", "consultation_fee", "slug", "education", "work_experience", "schedule"
         ]
         read_only_fields = ['id']
 

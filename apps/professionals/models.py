@@ -62,7 +62,8 @@ class ProfessionalProfile(models.Model):
     email = models.EmailField(null=True, blank=True)
     website = models.URLField(blank=True)
     location = models.TextField(blank=True, null=True)
-    location_latLng = models.CharField(max_length=200, blank=True, null=True)
+    latitude = models.DecimalField(max_digits=16, decimal_places=12, null=True, verbose_name=_("latitude"))
+    longitude = models.DecimalField(max_digits=16, decimal_places=12, null=True, verbose_name=_("longitude"))
 
     profile_image = models.ImageField(upload_to=professionalImagePath, null=True, blank=True)
     banner_image = models.ImageField(upload_to=professionalImagePath, null=True, blank=True)
@@ -132,6 +133,28 @@ class Schedule(models.Model):
 
     def __str__(self):
         return f"{self.day} - {self.user.fullname}"
+
+
+class Message(models.Model):
+    professional = models.ForeignKey(ProfessionalProfile, on_delete=models.CASCADE, related_name='messages')
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.professional.fullname} message"
+
+
+class Booking(models.Model):
+    professional = models.ForeignKey(ProfessionalProfile, on_delete=models.CASCADE, related_name='bookings')
+    date_booked = models.DateField()
+    time_booked = models.TimeField()
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.professional.fullname} booked {self.date_booked}"
+
+
 
 
 
