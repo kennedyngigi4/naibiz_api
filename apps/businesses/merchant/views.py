@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from decimal import Decimal
 
 from rest_framework import generics, status
 from rest_framework.views import APIView
@@ -7,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from apps.accounts.models import *
+from apps.affiliates.models import Referral
 from apps.businesses.models import *
 from apps.businesses.serializers import *
 from apps.messaging.serializers import *
@@ -34,6 +36,7 @@ class AddListingView(APIView):
     serializer_class = BusinessSerializer
 
     def post(self, request):
+        # 1. Create the business
         user = self.request.user
         serializer = self.serializer_class(data=request.data, context={"request": request})
         
@@ -46,9 +49,8 @@ class AddListingView(APIView):
             )
 
             if business:
-                print(phone)
-                print(int(category.price))
-                MPESA(phone, '400').MpesaSTKPush()
+                # 2. Mpesa 
+                MPESA(phone, int(category.price)).MpesaSTKPush()
                 return Response({ "success": True, "message": "Listing successful", })
         
         print("Validation Errors:", serializer.errors)

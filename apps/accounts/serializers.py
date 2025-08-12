@@ -13,6 +13,11 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 
+    def update(self, instance, validated_data):
+        if "profile_image" in validated_data and instance.profile_image: 
+            instance.profile_image.delete(save=False)
+        return super().update(instance, validated_data)
+
 
 
 

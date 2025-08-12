@@ -23,6 +23,11 @@ CORS_ALLOWED_ORIGINS = [
     "https://www.nairobibusiness.co.ke",
 ]
 
+# settings.py
+CORS_ALLOW_CREDENTIALS = True
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
+
 
 
 # Application definition
@@ -47,6 +52,7 @@ INSTALLED_APPS = [
     'apps.malls.apps.MallsConfig',
     'apps.messaging.apps.MessagingConfig',
     'apps.professionals.apps.ProfessionalsConfig',
+    'apps.affiliates.apps.AffiliatesConfig',
 ]
 
 

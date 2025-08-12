@@ -1,13 +1,12 @@
 from django.apps import AppConfig
 
 
-class BusinessesConfig(AppConfig):
+class AffiliatesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.businesses'
+    name = 'apps.affiliates'
 
 
     def ready(self):
-        import apps.businesses.signals
-
+        import apps.affiliates.signals
 
 

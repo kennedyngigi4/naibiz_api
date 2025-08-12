@@ -25,7 +25,7 @@ class MPESA:
         auth = requests.get(self.authorization_url, auth=HTTPBasicAuth(self.consumer_key, self.consumer_secret))
         response = json.loads(auth.text)
         access_token = response["access_token"]
-        
+        print(access_token)
         return access_token
 
 
@@ -57,7 +57,7 @@ class MPESA:
             "BusinessShortCode": self.LipaNow()['business_short_code'],
             "Password": lipa_now['decode_password'],
             "Timestamp": lipa_now['lipa_time'],
-            "TransactionType": "CustomerBuyGoodsOnline",
+            "TransactionType": "CustomerPayBillOnline",
             "Amount": self.amount,
             "PartyA": self.phone,  # replace with your phone number to get stk push
             "PartyB": lipa_now['business_short_code'],

@@ -1,7 +1,10 @@
+import os
 import uuid
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
+from django.conf import settings
+from PIL import Image, ImageDraw, ImageFont
 
 from apps.accounts.models import User
 from apps.malls.models import *
@@ -79,7 +82,7 @@ class Business(models.Model):
     tiktok = models.URLField(verbose_name=_("tiktok link"), null=True, blank=True)
     youtube = models.URLField(verbose_name=_("youtube link"), null=True, blank=True)
 
-    main_banner = models.ImageField(upload_to=BusinessImagePath, null=True, blank=True, verbose_name=_("main banner"))
+    main_banner = models.ImageField(upload_to=BusinessImagePath, null=True, blank=True, verbose_name=_("main banner"), max_length=255)
     profile_image = models.ImageField(upload_to=BusinessImagePath, null=True, blank=True, verbose_name=_("profile image"))
     section = models.CharField(
         max_length=20, choices=SECTION_CHOICES, null=True, blank=True,
@@ -98,14 +101,98 @@ class Business(models.Model):
 
 
     def save(self, *args, **kwargs):
+        # 1. generate slug
         if not self.slug:
-            # categories = "_ ".join([cat.name for cat in self.category.all()])
-            base_slug = slugify(f"{self.name}-{self.category.name}")
+            if hasattr(self.category, "name"):
+                category_part = self.category.name
+            else:
+                category_part = "uncategorized"
+
+            base_slug = slugify(f"{self.name}-{category_part}")
             unique_suffix = uuid.uuid4().hex[:10]
             self.slug = f"{base_slug}-{unique_suffix}"
 
         super().save(*args, **kwargs)
 
+        # 2. compress profileimages
+        if self.profile_image:
+            img_path = self.profile_image.path
+            img = Image.open(img_path)
+
+            if img.mode in ("RGBA", "P"):
+                img = img.convert("RGB")
+
+            # Save as optimized JPEG
+            img.save(img_path, format="JPEG", quality=70, optimize=True)
+
+        
+        # 3. compress banner images
+        if self.main_banner:
+            img_path = self.main_banner.path
+            img = Image.open(img_path)
+
+            if img.mode in ("RGBA", "P"):
+                img = img.convert("RGB")
+
+            # Create transparent layer for watermark
+            watermark_layer = Image.new("RGBA", img.size, (255, 255, 255, 0))
+            draw = ImageDraw.Draw(watermark_layer)
+
+            text1 = "POSTED ON NAIROBI BUSINESS"
+            text2 = self.name.upper()
+            spacing = 10
+
+            font_path = os.path.join(settings.BASE_DIR, "static", "fonts", "open_sans.ttf")
+
+            small_font_size = max(int(min(img.size) * 0.02), 24)
+            large_font_size = max(int(min(img.size) * 0.05), 24)
+
+            small_font = ImageFont.truetype(font_path, size=small_font_size)
+            large_font = ImageFont.truetype(font_path, size=large_font_size)
+
+            # For text1
+            bbox1 = draw.textbbox((0, 0), text1, font=small_font)
+            text1_w = bbox1[2] - bbox1[0]
+            text1_h = bbox1[3] - bbox1[1]
+
+            # For text2
+            bbox2 = draw.textbbox((0, 0), text2, font=large_font)
+            text2_w = bbox2[2] - bbox2[0]
+            text2_h = bbox2[3] - bbox2[1]
+
+            total_height = text1_h + text2_h + spacing
+            start_y = (img.height - total_height) // 2
+
+            # Text colors with transparency
+            text_fill = (180, 180, 180, 80)       # Gray, semi-transparent
+            stroke_fill = (255, 255, 255, 100)    # White, semi-transparent
+
+            draw.text(
+                ((img.width - text1_w) // 2, start_y),
+                text1,
+                font=small_font,
+                fill=text_fill,
+                stroke_width=1,
+                stroke_fill=stroke_fill
+            )
+
+            draw.text(
+                ((img.width - text2_w) // 2, start_y + text1_h + spacing),
+                text2,
+                font=large_font,
+                fill=text_fill,
+                stroke_width=1,
+                stroke_fill=stroke_fill
+            )
+
+            # Merge the watermark layer with the original image
+            img = img.convert("RGBA")
+            img_with_watermark = Image.alpha_composite(img, watermark_layer)
+
+            # Save final as JPEG
+            img_with_watermark.convert("RGB").save(img_path, format="JPEG", quality=70, optimize=True)
+
+    
 
     def get_week_schedule(self):
         return {
