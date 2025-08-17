@@ -84,8 +84,9 @@ class ListingUpdateAPIView(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def patch(self, request, slug):
+
         business = get_object_or_404(Business, slug=slug)
-        serializer = BusinessSerializer(business, data=request.data, partial=True)
+        serializer = BusinessSerializer(business, data=request.data, context={"request": request }, partial=True)
         print(type(request.FILES.get("profile_image"))) 
         if serializer.is_valid():
             print(business)
@@ -149,5 +150,25 @@ class MessagesView(generics.ListAPIView):
 
 
 
+
+class DeleteBusinessView(generics.DestroyAPIView):
+    serializer_class = BusinessSerializer
+    queryset = Business.objects.all()
+    permission_classes = [ IsAuthenticated ]
+    
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = self.request.user
+        business_name = instance.name  
+        self.perform_destroy(instance)
+
+        return Response({
+                "status": "success",
+                "message": f"Business '{business_name}' deleted successfully.",
+                "deleted_id": kwargs.get("id"),
+            },
+            status=status.HTTP_200_OK
+        )
 
 

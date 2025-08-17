@@ -12,6 +12,7 @@ urlpatterns = [
     path( "business/<slug:slug>/", BusinessDetailsView.as_view(), name="business", ),
     path( "review/", ReviewsView.as_view(), name="review", ),
     path( "similar_businesses/", SimilarBusinessView.as_view(), name="similar_businesses", ),
+    path( "search/", SearchQueryView.as_view(), name="search", ),
 ]
 
 

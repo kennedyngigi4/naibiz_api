@@ -91,3 +91,23 @@ class ReviewsView(generics.CreateAPIView):
         return Response({ "success": False, "message": serializer.errors })
 
 
+
+
+class SearchQueryView(generics.ListAPIView):
+    serializer_class = BusinessSerializer
+
+    def get_queryset(self):
+        queryset = Business.objects.all()
+        q = self.request.query_params.get("q")
+        location = self.request.query_params.get("location")
+        category = self.request.query_params.get("category")
+
+        if q:
+            queryset = queryset.filter(name__icontains=q)  # adjust fields
+        if location:
+            queryset = queryset.filter(location__icontains=location)
+        if category:
+            queryset = queryset.filter(category_id=category)  # if FK
+            # queryset = queryset.filter(category__name__icontains=category) # if name string
+
+        return queryset

@@ -114,6 +114,7 @@ class Business(models.Model):
 
         super().save(*args, **kwargs)
 
+
         # 2. compress profileimages
         if self.profile_image:
             img_path = self.profile_image.path

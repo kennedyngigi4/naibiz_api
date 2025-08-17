@@ -47,7 +47,7 @@ class Product(models.Model):
 
 
     def save(self, *args, **kwargs):
-        self.clean()
+        # self.clean()
 
         if not self.slug:
             base_slug = slugify(self.name)
