@@ -15,7 +15,7 @@ class MPESA:
     def __init__(self, phone, amount):
         self.consumer_key = "XSIH3QDsvyyHxQdyYzdppoIPCNoK5J0N6A21wWUlCiCEPae2"
         self.consumer_secret = "FLj5UWxswGfUh6Rds4AxkntcoqESWpLqdMsvVyiCInEQ285Ipw9nrGGsrfThqBvv"
-        self.authorization_url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
+        self.authorization_url = "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
         self.phone = phone
         self.amount = int(amount)
         
@@ -49,7 +49,7 @@ class MPESA:
     def MpesaSTKPush(self):
         
         access_token = self.generateCredentials()
-        api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+        api_url = "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
         headers = {"Authorization": "Bearer %s" % access_token}
 
         lipa_now = self.LipaNow()

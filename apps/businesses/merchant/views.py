@@ -50,7 +50,7 @@ class AddListingView(APIView):
 
             if business:
                 # 2. Mpesa 
-                MPESA(phone, int(category.price)).MpesaSTKPush()
+                # MPESA(phone, int(category.price)).MpesaSTKPush()
                 return Response({ "success": True, "message": "Listing successful", })
         
         print("Validation Errors:", serializer.errors)
