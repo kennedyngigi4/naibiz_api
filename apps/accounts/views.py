@@ -1,11 +1,16 @@
 from django.shortcuts import render
+from django.contrib.auth import get_user_model
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
+
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.accounts.models import *
 from apps.accounts.serializers import *
@@ -13,7 +18,7 @@ from apps.affiliates.models import *
 
 # Create your views here.
 
-
+User = get_user_model()
 
 class RegistrationView(APIView):
     serializer_class = RegistrationSerializer
@@ -66,6 +71,48 @@ class LoginView(TokenObtainPairView):
         except Exception as e:
             return Response({ "success": False, "message": "An unexpected error occurred.", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+
+
+class GoogleLoginView(APIView):
+    def post(self, request):
+        token = request.data.get("token")
+        
+        try:
+            # VERIFY GOOGLE ID TOKEN
+            idinfo = id_token.verify_oauth2_token(
+                token, requests.Request(), settings.GOOGLE_CLIENT_ID
+            )
+
+            email = idinfo["email"]
+
+            user = User.objects.filter(email=email).first()
+            if not user:
+                return Response({
+                    "success": False,
+                    "message": "No account found. Please sign up first."
+                }, status=status.HTTP_403_FORBIDDEN)
+            
+
+            
+            # ISSUE jwt token
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+                "success": True,
+                "id": user.id,
+                "fullname": user.fullname,
+                "email": user.email,
+                "role": user.role,
+            })
+
+
+        except ValueError:
+            return Response({
+                "success": False,
+                "message": "Invalid Google token"
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 
