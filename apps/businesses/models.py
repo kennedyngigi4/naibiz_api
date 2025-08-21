@@ -63,7 +63,7 @@ class Business(models.Model):
     name = models.CharField(max_length=255, verbose_name=_("business name"))
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, related_name="businesses", verbose_name=_("related categories"))
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("subcategory"))
-    mall = models.ForeignKey(Mall, on_delete=models.SET_NULL, null=True, related_name="business_malls")
+    mall = models.ForeignKey(Mall, on_delete=models.SET_NULL, null=True, blank=True, related_name="business_malls")
     services = models.TextField(null=True, verbose_name=_("services"))
     location = models.CharField(max_length=255, null=True, verbose_name=_("geo location"))
     latitude = models.DecimalField(max_digits=16, decimal_places=12, null=True, verbose_name=_("latitude"))

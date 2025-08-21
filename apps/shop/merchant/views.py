@@ -39,3 +39,25 @@ class BusinessProductsView(generics.ListAPIView):
         queryset = Product.objects.filter(created_by=user, business=business)
         return queryset
 
+
+
+class DeleteProductView(generics.DestroyAPIView):
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all()
+    permission_classes = [ IsAuthenticated ]
+
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = self.request.user
+        product_name = instance.name
+        self.perform_destroy(instance)
+
+        return Response({
+            "status": "success",
+            "message": f"Product '{product_name}' deleted successfully.",
+            "deleted_id": kwargs.get("id"),
+        }, status=status.HTTP_200_OK)
+
+
+

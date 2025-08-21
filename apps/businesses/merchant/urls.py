@@ -15,6 +15,7 @@ urlpatterns = [
     path("gallery/", MerchantUploadImageView.as_view(), name="gallery", ),
 
     path( "delete/<str:pk>/", DeleteBusinessView.as_view(), name="delete", ),
+    path( "delete-gallery/<str:pk>/", DeleteGalleryImage.as_view(), name="delete-gallery", ),
 ]
 
 

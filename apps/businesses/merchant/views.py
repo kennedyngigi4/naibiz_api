@@ -172,3 +172,19 @@ class DeleteBusinessView(generics.DestroyAPIView):
         )
 
 
+
+class DeleteGalleryImage(generics.DestroyAPIView):
+    serializer_class = GallerySerializer
+    queryset = BusinessGallery.objects.all()
+    permission_classes = [ IsAuthenticated ]
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = self.request.user
+        self.perform_destroy(instance)
+
+        return Response({
+            "status": "success",
+            "message": f"Deleted successfully.",
+            "deleted_id": kwargs.get("id"),
+        }, status=status.HTTP_200_OK)
