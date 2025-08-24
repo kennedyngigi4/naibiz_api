@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.db.models import Count
+from django.db.models.functions import Lower
 
 from rest_framework import generics, status
 from rest_framework.views import APIView
@@ -103,9 +104,9 @@ class SearchQueryView(generics.ListAPIView):
         category = self.request.query_params.get("category")
 
         if q:
-            queryset = queryset.filter(name__icontains=q)  # adjust fields
+            queryset = queryset.annotate(name_lower=Lower("name")).filter(name_lower__icontains=q.lower())  # adjust fields
         if location:
-            queryset = queryset.filter(location__icontains=location)
+            queryset = queryset.annotate(location_lower=Lower("location")).filter(location_lower__icontains=location.lower())
         if category:
             queryset = queryset.filter(category_id=category)  # if FK
             # queryset = queryset.filter(category__name__icontains=category) # if name string
