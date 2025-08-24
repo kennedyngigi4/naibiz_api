@@ -8,23 +8,19 @@ from apps.accounts.models import User
 
 
 
-def send_html_email(user_email, context):
-    subject = "Welcome to Nairobi Business!"
-    from_email = settings.DEFAULT_FROM_EMAIL
-    recipient_list = [user_email]
-
-    text_content = "Welcome to our app!"
-    html_content = render_to_string("accounts/welcome_email.html", context)
-
-    msg = EmailMultiAlternatives(subject, text_content, from_email, recipient_list)
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-
-
 @receiver(post_save, sender=User)
 def send_selcome_email(sender, instance, created, **kwargs):
     if created:
+        subject = "Welcome to Nairobi Business Directory!"
+        from_email = None
+        to_email = [instance.email]
         context = {"user": instance, "fullname": instance.fullname}
-        send_html_email(instance.email, context)
+
+        html_content = render_to_string("accounts/welcome_email.html", context)
+        text_content = "Welcome to Nairobi Business Directory! We're excited to have you on board."
+        
+        msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
 
 
