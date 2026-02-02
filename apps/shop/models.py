@@ -1,4 +1,7 @@
 import uuid
+
+from django.db import transaction
+from django.utils import timezone
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
@@ -62,4 +65,113 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.name} of {self.business.name} owned by {self.created_by.fullname}"
+
+
+
+
+
+
+def generate_order_number():
+    year = timezone.now().year
+
+    last_order = (
+        Order.objects
+        .filter(order_number__startswith=f"NAI-{year}")
+        .order_by("-date_created")
+        .first()
+    )
+
+    if last_order and last_order.order_number:
+        last_number = int(last_order.order_number.split("-")[-1])
+        new_number = last_number + 1
+    else:
+        new_number = 1
+
+    return f"NAI-{year}-{new_number:06d}"
+
+
+
+class Order(models.Model):
+
+    STATUS_CHOICES = [
+        ("pending", "pending"),
+        ( "processing", "processing"),
+        ( "dispatched", "dispatched"),
+        ( "delivered", "delivered"),
+    ]
+
+
+    PAYMENT_STATUS_CHOICES = [
+        ("pending", "pending"),
+        ("paid", "paid"),
+        ("failed", "failed"),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True, verbose_name=_("unique ID"))
+    order_number = models.CharField(
+        max_length=30,
+        unique=True,
+        editable=False,
+        db_index=True
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=100, choices=STATUS_CHOICES, default="pending")
+    payment_status = models.CharField(
+        max_length=20, choices=PAYMENT_STATUS_CHOICES, default="pending"
+    )
+
+    mpesa_checkout_request_id = models.CharField(
+        max_length=100, blank=True, null=True
+    )
+
+    mpesa_receipt_number = models.CharField(
+        max_length=100, blank=True, null=True
+    )
+
+
+    date_created = models.DateTimeField(auto_now_add=True)
+
+
+    def save(self, *args, **kwargs):
+        if not self.order_number:
+            with transaction.atomic():
+                self.order_number = generate_order_number()
+        super().save(*args, **kwargs)
+
+    
+    def __str__(self):
+        return f"Order by {self.user.fullname}"
+
+
+
+class OrderItem(models.Model):
+
+    STATUS_CHOICES = [
+        ("pending", "pending"),
+        ( "processing", "processing"),
+        ( "dispatched", "dispatched"),
+        ( "delivered", "delivered"),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True, verbose_name=_("unique ID"))
+   
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.PositiveIntegerField(default=1)
+
+    seller =  models.ForeignKey(User, on_delete=models.PROTECT, related_name="item_seller")
+    status = models.CharField(max_length=100, choices=STATUS_CHOICES, default="pending")
+
+    date_created = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.product.name} x{self.quantity}"
+
+
+
+
 
